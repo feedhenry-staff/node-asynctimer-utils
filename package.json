@@ -1,0 +1,14 @@
+{
+  "name": "AsyncTimeout",
+  "version": "0.0.0",
+  "description": "An asynchronous timer which can be stopped, paused, resumed and restarted. emits events in typical node fashion.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sean Nicholls",
+  "license": "ISC",
+  "dependencies": {
+    "async" : "0.2.5"
+  }
+}
