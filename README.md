@@ -40,7 +40,15 @@ async.series([
       }
     }
 
-
 ]);
+```
 
+Additionally, you can have the timer continue indefinitely similar to setInterval like so:
+``` javascript
+timeout = new AsyncTimeout({ delay: 100 });
+timeout.on('timeout', function(scope) {
+  console.log('> Timeout has expired!');
+  res.end('> Timeout has expired!');
+  scope.restart();
+});
 ```
