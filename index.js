@@ -10,19 +10,18 @@ function AsyncTimeout(config) {
     }
   */
 
-  config = config ? config : {};
-
   var instance = this;
+  instance._config = config ? config : {};
+
   instance._active = false;
   instance._timer = null;
-
   instance._paused = false;
   instance._began = null;
+  instance._autostart = false;
+  instance._delay = 3000;
 
-  instance._autostart = (typeof(config.autostart) !== 'undefined' ? config.autostart : true);
-  instance._delay = (typeof(config.delay) !== 'undefined' ? config.delay : 3000);
-
-  instance.init = function() {
+  instance._init = function() {
+    instance._reset();
     if(instance._autostart && !instance._active) {
       instance.start();
     }
@@ -37,7 +36,7 @@ function AsyncTimeout(config) {
         instance._paused = false;
         instance._began = new Date();
         instance._timer = setTimeout(instance._onComplete, instance._delay);
-        instance.emit('start');
+        instance.emit('start', instance);
       }
     }
   };
@@ -51,7 +50,7 @@ function AsyncTimeout(config) {
       instance._active = false;
       instance._paused = false;
       clearTimeout(instance._timer);
-      instance.emit('stop');
+      instance.emit('stop', instance);
     }
   }
 
@@ -64,7 +63,7 @@ function AsyncTimeout(config) {
       instance.stop();
     }
     instance.start();
-    instance.emit('restart');
+    instance.emit('restart', instance);
   }
 
   instance.pause = function() {
@@ -72,7 +71,7 @@ function AsyncTimeout(config) {
       instance._paused = true;
       instance._delay -= (new Date() - instance._began);
       clearTimeout(instance._timer);
-      instance.emit('pause');
+      instance.emit('pause', instance);
     }
   }
 
@@ -83,8 +82,8 @@ function AsyncTimeout(config) {
       instance._began = new Date();
       instance._timer = setTimeout(instance._onComplete, instance._delay);
 
-      instance.emit('start');
-      instance.emit('resume');
+      instance.emit('start', instance);
+      instance.emit('resume', instance);
     }
   }
 
@@ -96,13 +95,28 @@ function AsyncTimeout(config) {
     return (instance.isStarted() && !instance.isPaused());
   }
 
+  // do a complete reset of internal state
+  // only used on initialization & when a 
+  // timer expires.
+  instance._reset = function() {    
+    instance._active = false;
+    instance._timer = null;
+
+    instance._paused = false;
+    instance._began = null;
+
+    instance._autostart = (typeof(instance._config.autostart) !== 'undefined' ? instance._config.autostart : true);
+    instance._delay = (typeof(instance._config.delay) !== 'undefined' ? instance._config.delay : 3000);
+  }
+
   instance._onComplete = function() {
     if(instance.isAlive()) {
-      instance.emit('timeout');
+      instance._reset();
+      instance.emit('timeout', instance);
     }
   };
 
-  instance.init();
+  instance._init();
 
 };
 
