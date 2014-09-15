@@ -124,7 +124,7 @@ function AsyncTimeout(config) {
     return (instance.isStarted() && !instance.isPaused());
   }
 
-  instance.getElaspedTime = function() {
+  instance.getElapsedTime = function() {
     if(!instance.isPaused && !instance.isStopped) {
       instance._stoppedTimestamp = new Date();
       instance._timeTaken = instance._stoppedTimestamp - instance._beganTimestamp;
