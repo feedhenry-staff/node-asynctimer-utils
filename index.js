@@ -1,6 +1,29 @@
 var EventEmitter = require("events").EventEmitter;
 var util = require('util');
 
+/* 
+  TODO: 
+
+    * set delay
+
+    * get delay
+
+    * set index
+
+    this will allow timers to be updated / reused. 
+
+    for example, when doing multiple tasks, can increase
+    the timeout for each step without creating a new object.
+
+    simply update the delay and set the index to something
+    identifiable.
+
+    * expire();
+
+    will allow the explicit calling of expiration callback
+
+*/
+
 function AsyncTimeout(config) {
 
   /*
@@ -16,12 +39,14 @@ function AsyncTimeout(config) {
   instance._active = false;
   instance._timer = null;
   instance._paused = false;
-  instance._began = null;
+  instance._beganTimestamp = null;
+  instance._stoppedTimestamp = null;
+  instance._timeTaken = null;
   instance._autostart = false;
   instance._delay = 3000;
 
   instance._init = function() {
-    instance._reset();
+    _reset();
     if(instance._autostart && !instance._active) {
       instance.start();
     }
@@ -34,7 +59,7 @@ function AsyncTimeout(config) {
       } else {
         instance._active = true;
         instance._paused = false;
-        instance._began = new Date();
+        instance._beganTimestamp = new Date();
         instance._timer = setTimeout(instance._onComplete, instance._delay);
         instance.emit('start', instance);
       }
@@ -47,6 +72,8 @@ function AsyncTimeout(config) {
 
   instance.stop = function() {
     if(instance._active) {
+      instance._stoppedTimestamp = new Date();
+      instance._timeTaken = instance._stoppedTimestamp - instance._beganTimestamp;
       instance._active = false;
       instance._paused = false;
       clearTimeout(instance._timer);
@@ -68,8 +95,10 @@ function AsyncTimeout(config) {
 
   instance.pause = function() {
     if(instance.isAlive()) {
+      instance._stoppedTimestamp = new Date();
+      instance._timeTaken = instance._stoppedTimestamp - instance._beganTimestamp;
       instance._paused = true;
-      instance._delay -= (new Date() - instance._began);
+      instance._delay -= (new Date() - instance._beganTimestamp);
       clearTimeout(instance._timer);
       instance.emit('pause', instance);
     }
@@ -79,8 +108,8 @@ function AsyncTimeout(config) {
     if(instance._paused) {
       instance._active = true;
       instance._paused = false;
-      instance._began = new Date();
-      instance._timer = setTimeout(instance._onComplete, instance._delay);
+      instance._beganTimestamp = new Date();
+      instance._timer = setTimeout(_onComplete, instance._delay);
 
       instance.emit('start', instance);
       instance.emit('resume', instance);
@@ -95,23 +124,31 @@ function AsyncTimeout(config) {
     return (instance.isStarted() && !instance.isPaused());
   }
 
+  instance.getElaspedTime = function() {
+    if(!instance.isPaused && !instance.isStopped) {
+      instance._stoppedTimestamp = new Date();
+      instance._timeTaken = instance._stoppedTimestamp - instance._beganTimestamp;
+    }
+    return instance._timeTaken;
+  }
+
   // do a complete reset of internal state
   // only used on initialization & when a 
   // timer expires.
-  instance._reset = function() {    
+  var _reset = function() {    
     instance._active = false;
     instance._timer = null;
 
     instance._paused = false;
-    instance._began = null;
+    instance._beganTimestamp = null;
 
     instance._autostart = (typeof(instance._config.autostart) !== 'undefined' ? instance._config.autostart : true);
     instance._delay = (typeof(instance._config.delay) !== 'undefined' ? instance._config.delay : 3000);
   }
 
-  instance._onComplete = function() {
+  var _onComplete = function() {
     if(instance.isAlive()) {
-      instance._reset();
+      _reset();
       instance.emit('timeout', instance);
     }
   };
