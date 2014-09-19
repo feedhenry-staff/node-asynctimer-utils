@@ -8,8 +8,6 @@ function AsyncTimeout(config) {
 
     * set delay
 
-    * get delay
-
     * set index
 
     this will allow timers to be updated / reused. 
@@ -19,10 +17,6 @@ function AsyncTimeout(config) {
 
     simply update the delay and set the index to something
     identifiable.
-
-    * expire();
-
-    will allow the explicit calling of expiration callback
 
 */
 
@@ -43,6 +37,7 @@ function AsyncTimeout(config) {
     }
   }
 
+  // start a timer (use with autostart set to false)
   instance.start = function() {
     if(!instance._active) {
       if(instance._paused) {
@@ -57,6 +52,7 @@ function AsyncTimeout(config) {
     }
   };
 
+  // stop the timer
   instance.stop = function() {
     if(instance._active) {
       instance._active = false;
@@ -66,10 +62,7 @@ function AsyncTimeout(config) {
     }
   }
 
-  instance.isStopped = function() {
-    return !instance._active;
-  }
-
+  // restart the timer
   instance.restart = function() {
     if(instance._active) {
       instance.stop();
@@ -78,6 +71,7 @@ function AsyncTimeout(config) {
     instance.emit('restart', instance);
   }
 
+  // pause the timer
   instance.pause = function() {
     if(instance.isAlive()) {
       instance._paused = true;
@@ -87,6 +81,7 @@ function AsyncTimeout(config) {
     }
   }
 
+  // resume a paused timer
   instance.resume = function() {
     if(instance._paused) {
       instance._active = true;
@@ -99,12 +94,27 @@ function AsyncTimeout(config) {
     }
   }
 
+  // forcefully make the timer expire
   instance.expire = function() {
-    _onComplete();
+    return _onComplete();
+  }
+
+  // clear the timer
+  instance.clear = function() {
+    return instance._invalidate();
+  }
+
+  instance._invalidate = function() {    
+    clearTimeout(instance._timer);
+    instance._reset();
   }
 
   instance.isStarted = function() {
     return instance._active;
+  }
+
+  instance.isStopped = function() {
+    return !instance._active;
   }
 
   instance.isPaused = function() {
@@ -115,6 +125,7 @@ function AsyncTimeout(config) {
     return (instance.isStarted() && !instance.isPaused());
   }
 
+  // provide a default error for throwing when the timer expires
   Object.defineProperty(  instance,
                           'TimeoutException', {
     value: new Error('AsyncTimeout: Timeout'),
@@ -122,6 +133,11 @@ function AsyncTimeout(config) {
     enumerable: true,
     configurable: true
   });
+
+  // handy function because people are lazy and don't do triple-equals
+  instance.isTimeoutException = function(err) {
+    return (err === instance.TimeoutException);
+  }
 
   instance.getDelay = function() {
     return instance._delay;
