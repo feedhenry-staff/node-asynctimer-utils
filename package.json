@@ -4,7 +4,7 @@
   "description": "An asynchronous timer which can be stopped, paused, resumed and restarted. emits events in typical node fashion.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodeunit test"
   },
   "author": "Sean Nicholls",
   "license": "ISC",
