@@ -1,5 +1,5 @@
 var lib = require(__dirname + '/../index.js');
-var AsyncTimeout = lib.AsyncTimeout;
+var TimeMonitor = lib.TimeMonitor;
 
 var TimeMonitorTests = {
 
