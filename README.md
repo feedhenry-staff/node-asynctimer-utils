@@ -12,7 +12,7 @@ timer.on('timeout', function() {
 })
 ```
 
-## Use case
+## AsyncTimeout
 
 A typical use case for this is when doing multiple tasks in parallel which may require a timeout, such as processing data or communicating with an external database - typically something which has a potential for taking longer than is appropriate to make a user wait for.
 
@@ -27,7 +27,6 @@ async.series([
       timeout = new AsyncTimeout({ delay: 10000 });
       timeout.on('timeout', function() {
         console.log('> Timeout has expired!');
-        res.end('> Timeout has expired!');
       });
 
       next();
@@ -52,3 +51,38 @@ timeout.on('timeout', function(scope) {
   scope.restart();
 });
 ```
+
+### Events
+  * start
+  * stop
+  * restart
+  * pause
+  * resume
+  * timeout
+
+
+## MonotonicDelayTimeout
+
+An asynchronous timeout object, which will monotonically increase the delay time each time the timeout is called. You can even overload the monotonicCalculator method to provide your own logic for how the delay changes with time.
+
+For example:
+``` javascript
+timeout = new MonotonicDelayTimeout({ delay: 1000, maxAttempts: 10 });
+timeout.on('timeout', function() {
+  console.log('> Timeout has expired!');
+});
+
+timeout.on('maxAttempts', function() {
+  console.log('> Timeout reached the maximum attempts!');
+});
+```
+
+By default the delay is increased by 150% each time the timeout is called.
+
+### Events
+  * start
+  * stop
+  * restart
+  * pause
+  * resume
+  * maxAttempts
