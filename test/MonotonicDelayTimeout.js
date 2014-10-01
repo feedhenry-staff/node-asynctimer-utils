@@ -1,6 +1,8 @@
 var lib = require(__dirname + '/../index.js');
 var MonotonicDelayTimeout = lib.MonotonicDelayTimeout;
 
+var debug = false;
+
 var MonotonicDelayTimeoutTests = {
 
   setUp: function(done) {
@@ -13,42 +15,66 @@ var MonotonicDelayTimeoutTests = {
 
   test1: function(test) {
 
-    var delayTimeout = new MonotonicDelayTimeout();
+    var delayTimeout = new MonotonicDelayTimeout({ delay: 1000, autostart: false });
 
     delayTimeout.on('start', function() {
-      console.log('> start ' + this.getDelay() + 'ms');
+      if(debug) {
+        console.log('> start ' + this.getDelay() + 'ms');
+      }
     });
     
     delayTimeout.on('stop', function() {
-      console.log('> stop');
+      if(debug) {
+        console.log('> stop');
+      }
     });
     
     delayTimeout.on('restart', function() {
-      console.log('> restart');
+      if(debug) {
+        console.log('> restart');
+      }
     });
     
     delayTimeout.on('pause', function() {
-      console.log('> pause');
+      if(debug) {
+        console.log('> pause');
+      }
     });
     
     delayTimeout.on('resume', function() {
-      console.log('> resume');
+      if(debug) {
+        console.log('> resume');
+      }
     });
-    
+
     delayTimeout.on('timeout', function() {
-      console.log('> timeout\n');
+      if(debug) {
+        console.log('> timeout\n');
+      }
     });
     
     delayTimeout.on('maxAttempts', function() {
-      console.log('> maxAttempts');
+      if(debug) {
+        console.log('> maxAttempts');
+      }
     });
-
 
     delayTimeout.start();
 
+    setTimeout(function() {
+      var num = delayTimeout.getAttemptIndex()+1;
 
-    test.ok(1);
-    test.done();
+      if(debug){
+        console.log('Number of Attempts in 10s: ' + num);
+      }
+      
+      delayTimeout.stop();
+
+      test.equal(num, 5);
+      test.done();
+
+    }, 10000);
+
   },
 
 };
