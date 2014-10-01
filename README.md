@@ -86,3 +86,25 @@ By default the delay is increased by 150% each time the timeout is called.
   * pause
   * resume
   * maxAttempts
+
+## TimeMonitor
+
+Calculates duration between starting and stopping; A very bare-bones object, but provides a handy utility if you want to know how long it took for operation(s) to complete.
+
+For example:
+``` javascript
+var monitor = new TimeoutMonitor();
+monitor.start();
+
+// do something that takes time
+setTimeout(function() {
+  // thinking
+}, (Math.random() * 5000) + 1000);
+
+monitor.stop();
+console.log(monitor.timeTaken());
+```
+
+### Events
+  * start
+  * stop
