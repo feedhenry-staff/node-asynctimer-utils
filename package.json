@@ -1,6 +1,6 @@
 {
   "name": "AsyncTimeoutUtils",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An asynchronous timer which can be stopped, paused, resumed and restarted. emits events in typical node fashion.",
   "main": "index.js",
   "scripts": {
@@ -10,5 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "async" : "0.2.5"
+  },
+
+  "devDependencies": {    
+    "node-unit": "*"
   }
+
 }
