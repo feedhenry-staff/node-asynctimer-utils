@@ -4,7 +4,7 @@
   "description": "An asynchronous timer which can be stopped, paused, resumed and restarted. emits events in typical node fashion.",
   "main": "index.js",
   "scripts": {
-    "test": "nodeunit test/index.js"
+    "test": "nodeunit ./test/"
   },
   "author": "Sean Nicholls",
   "license": "MIT",
